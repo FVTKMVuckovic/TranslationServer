@@ -648,7 +648,7 @@ export default function SessionPage() {
                 FRAGEN ({questions.length})
               </h3>
               <div className="space-y-2">
-                {questions.map((q, i) => {
+                {[...questions].reverse().map((q, i) => {
                   const flagMap: Record<string, string> = {
                     'en': '🇬🇧',
                     'sr-Cyrl': '🇷🇸',
