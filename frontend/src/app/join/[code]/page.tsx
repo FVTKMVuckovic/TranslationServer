@@ -177,7 +177,8 @@ export default function ParticipantPage() {
   const [sentQuestions, setSentQuestions] = useState<{text: string, timestamp: Date}[]>([]);
   const [questionsExpanded, setQuestionsExpanded] = useState(true);
 
-  // Load saved data from localStorage on mount
+  // Load saved language and questions from localStorage on mount
+  // Note: Transcripts are NOT restored - they come fresh from WebSocket
   useEffect(() => {
     if (sessionCode) {
       const storageKey = `participant-${sessionCode}`;
@@ -186,7 +187,7 @@ export default function ParticipantPage() {
         try {
           const data = JSON.parse(saved);
           if (data.language) setSelectedLanguage(data.language);
-          if (data.transcripts) setTranscripts(data.transcripts);
+          // Don't restore transcripts - they will come from WebSocket
           if (data.questions) {
             // Restore questions with Date objects
             setSentQuestions(data.questions.map((q: any) => ({
@@ -201,18 +202,17 @@ export default function ParticipantPage() {
     }
   }, [sessionCode]);
 
-  // Save data to localStorage when it changes
+  // Save language and questions to localStorage (not transcripts)
   useEffect(() => {
     if (sessionCode && selectedLanguage) {
       const storageKey = `participant-${sessionCode}`;
       localStorage.setItem(storageKey, JSON.stringify({
         language: selectedLanguage,
-        transcripts,
         questions: sentQuestions,
         lastUpdated: new Date().toISOString(),
       }));
     }
-  }, [sessionCode, selectedLanguage, transcripts, sentQuestions]);
+  }, [sessionCode, selectedLanguage, sentQuestions]);
 
   // Continuous microphone for speaking
   const [isSpeaking, setIsSpeaking] = useState(false);
