@@ -239,23 +239,39 @@ export default function ParticipantPage() {
   const requestWakeLock = async () => {
     try {
       if ('wakeLock' in navigator) {
+        // Release existing lock first if any
+        if (wakeLockRef.current) {
+          try {
+            await wakeLockRef.current.release();
+          } catch (e) {
+            // Ignore release errors
+          }
+        }
+
         wakeLockRef.current = await (navigator as any).wakeLock.request('screen');
         console.log('Wake Lock acquired - screen will stay on');
 
         // Re-acquire wake lock if it's released (e.g., when switching tabs)
         wakeLockRef.current.addEventListener('release', () => {
           console.log('Wake Lock released');
+          wakeLockRef.current = null;
+          // Try to re-acquire if page is still visible
+          if (document.visibilityState === 'visible') {
+            setTimeout(() => requestWakeLock(), 100);
+          }
         });
       }
     } catch (err) {
       console.log('Wake Lock not available:', err);
+      wakeLockRef.current = null;
     }
   };
 
   // Re-acquire wake lock when page becomes visible again
   useEffect(() => {
     const handleVisibilityChange = async () => {
-      if (document.visibilityState === 'visible' && selectedLanguage && !wakeLockRef.current) {
+      if (document.visibilityState === 'visible' && selectedLanguage) {
+        // Always try to re-acquire when page becomes visible
         await requestWakeLock();
       }
     };
@@ -264,6 +280,13 @@ export default function ParticipantPage() {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
+  }, [selectedLanguage]);
+
+  // Request Wake Lock immediately when language is restored from localStorage
+  useEffect(() => {
+    if (selectedLanguage) {
+      requestWakeLock();
+    }
   }, [selectedLanguage]);
 
   // Connect when language is selected
