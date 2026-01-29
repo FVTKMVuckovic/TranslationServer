@@ -16,7 +16,6 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     build-essential \
     libssl-dev \
-    libssl1.1 \
     ca-certificates \
     libasound2 \
     libasound2-dev \
@@ -30,6 +29,11 @@ RUN apt-get update && apt-get install -y \
     curl \
     wget \
     && rm -rf /var/lib/apt/lists/*
+
+# Install libssl1.1 from Ubuntu 20.04 (focal) - required for Azure Speech SDK
+RUN wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb \
+    && dpkg -i libssl1.1_1.1.1f-1ubuntu2_amd64.deb \
+    && rm libssl1.1_1.1.1f-1ubuntu2_amd64.deb
 
 # Set Python 3.11 as default
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 \
