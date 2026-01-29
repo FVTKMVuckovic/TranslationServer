@@ -1,0 +1,47 @@
+# Environment variables - NIEMALS committen!
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Dependencies
+node_modules/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Build outputs
+.next/
+out/
+dist/
+build/
+*.egg-info/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# SSL certificates (falls lokal)
+nginx/ssl/
+*.pem
+*.key
+*.crt
+
+# Test coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Docker volumes (lokal)
+postgres_data/
