@@ -598,14 +598,15 @@ export default function ParticipantPage() {
             }
           }
 
-          // Show interim text
+          // Show interim text while speaking
           if (interimTranscript) {
             setCurrentSpeech(interimTranscript);
           }
 
-          // Send final text to leader
+          // When final: add to text field for review (don't auto-send)
           if (finalTranscript) {
-            sendSpeechToLeader(finalTranscript);
+            setQuestionText(prev => prev ? prev + ' ' + finalTranscript : finalTranscript);
+            setShowQuestionInput(true);
             setCurrentSpeech('');
           }
         };
@@ -1002,32 +1003,7 @@ export default function ParticipantPage() {
           {/* Text Question Input (collapsible) */}
           {showQuestionInput && (
             <div className="space-y-3 mt-3">
-              {/* Recording indicator */}
-              {isRecordingQuestion && (
-                <div className="flex items-center justify-center gap-2 text-red-400 text-sm animate-pulse">
-                  <span className="w-2 h-2 bg-red-400 rounded-full" />
-                  {t.speakingQuestion}
-                </div>
-              )}
-
               <div className="flex gap-2">
-                {/* Voice Input Button */}
-                <button
-                  onClick={toggleQuestionRecording}
-                  className={`px-4 py-3 rounded-lg transition-colors ${
-                    isRecordingQuestion
-                      ? 'bg-red-500 hover:bg-red-600 text-white'
-                      : 'bg-slate-700 hover:bg-slate-600 text-slate-300'
-                  }`}
-                  title={t.speakQuestion}
-                >
-                  {isRecordingQuestion ? (
-                    <MicOff className="w-5 h-5" />
-                  ) : (
-                    <Mic className="w-5 h-5" />
-                  )}
-                </button>
-
                 {/* Text Input */}
                 <input
                   type="text"
@@ -1037,7 +1013,6 @@ export default function ParticipantPage() {
                   placeholder={t.typeQuestion}
                   className="flex-1 px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
                   autoFocus
-                  readOnly={isRecordingQuestion}
                 />
 
                 {/* Send Button */}
@@ -1053,7 +1028,6 @@ export default function ParticipantPage() {
                 <button
                   onClick={() => {
                     setShowQuestionInput(false);
-                    stopQuestionRecording();
                     setQuestionText('');
                   }}
                   className="px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
@@ -1061,10 +1035,6 @@ export default function ParticipantPage() {
                   ✕
                 </button>
               </div>
-
-              <p className="text-xs text-slate-500 text-center">
-                {t.tapOrClickMic}
-              </p>
             </div>
           )}
         </div>
