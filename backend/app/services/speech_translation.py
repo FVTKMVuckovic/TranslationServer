@@ -32,16 +32,15 @@ class SpeechTranslationService:
 
         translation_config.speech_recognition_language = source_language
 
-        # Sehr aggressive Pause-Erkennung für kürzere Sätze
+        # Pause-Erkennung auf Azure Standard (500ms)
         # Segmentation silence timeout: Zeit der Stille, nach der ein Satz als beendet gilt
-        # Standard ist ~500ms, wir setzen es auf 100ms für maximale Reaktionsgeschwindigkeit
         translation_config.set_property(
-            speechsdk.PropertyId.Speech_SegmentationSilenceTimeoutMs, "100"
+            speechsdk.PropertyId.Speech_SegmentationSilenceTimeoutMs, "500"
         )
 
         # End silence timeout: Maximale Stille am Ende bevor Erkennung stoppt
         translation_config.set_property(
-            speechsdk.PropertyId.SpeechServiceConnection_EndSilenceTimeoutMs, "200"
+            speechsdk.PropertyId.SpeechServiceConnection_EndSilenceTimeoutMs, "500"
         )
 
         for lang in target_languages:
