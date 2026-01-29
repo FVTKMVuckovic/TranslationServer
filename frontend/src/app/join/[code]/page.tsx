@@ -163,6 +163,7 @@ export default function ParticipantPage() {
   const [selectedLanguage, setSelectedLanguage] = useState<string>('');
   const [connected, setConnected] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(true);
+  const audioEnabledRef = useRef(true); // Ref for closure access
   const [transcripts, setTranscripts] = useState<Transcript[]>([]);
   const [liveText, setLiveText] = useState<string>(''); // Current interim translation
   const [error, setError] = useState('');
@@ -354,8 +355,8 @@ export default function ParticipantPage() {
             setTranscripts((prev) => [...prev, data]);
             setLiveText('');
 
-            // Play TTS if audio is enabled
-            if (audioEnabled && translatedText) {
+            // Play TTS if audio is enabled (use ref for current value)
+            if (audioEnabledRef.current && translatedText) {
               await playTTS(translatedText);
             }
           } else {
@@ -377,8 +378,8 @@ export default function ParticipantPage() {
           });
           setLiveText('');
 
-          // Play TTS for the updated text
-          if (audioEnabled && updatedText) {
+          // Play TTS for the updated text (use ref for current value)
+          if (audioEnabledRef.current && updatedText) {
             await playTTS(updatedText);
           }
           break;
@@ -830,7 +831,9 @@ export default function ParticipantPage() {
                 if (audioContextRef.current.state === 'suspended') {
                   await audioContextRef.current.resume();
                 }
-                setAudioEnabled(!audioEnabled);
+                const newValue = !audioEnabled;
+                setAudioEnabled(newValue);
+                audioEnabledRef.current = newValue;
               }}
               className={`p-2 rounded-lg transition-colors ${
                 audioEnabled ? 'bg-primary-600 text-white' : 'bg-slate-700 text-slate-400'
@@ -912,7 +915,7 @@ export default function ParticipantPage() {
             </button>
             {questionsExpanded && (
               <div className="px-4 pb-3 space-y-2">
-                {sentQuestions.map((q, i) => (
+                {[...sentQuestions].reverse().map((q, i) => (
                   <div key={i} className="bg-slate-800/50 rounded-lg p-3 border-l-4 border-primary-500">
                     <p className="text-white text-sm">{q.text}</p>
                     <span className="text-xs text-green-400 mt-1 block">
